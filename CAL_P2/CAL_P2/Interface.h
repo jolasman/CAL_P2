@@ -3,9 +3,12 @@
 
 
 
-void menu_inicial();
+void main_menu();
 
 
+void screen_exit();
+
+void game_menu();
 
 
 

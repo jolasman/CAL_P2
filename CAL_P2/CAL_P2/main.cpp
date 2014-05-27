@@ -9,7 +9,7 @@ using namespace std;
 int main()
 {
 
-	menu_inicial();
+	game_menu();
 
 
 	return 0;
