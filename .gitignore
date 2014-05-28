@@ -220,6 +220,7 @@ pip-log.txt
 #paths
 Debug/*
 *CAL_P2/*
+/CAL_P2
 
 completa palavra.sln
 completa palavra.vcxproj.filters
