@@ -49,8 +49,6 @@ int main()
 
 	//loadFromDictionary(words, filepath);
 	mainMenu();
-	
-
 	return 0;
 
 }
