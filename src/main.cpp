@@ -47,8 +47,8 @@ int main()
 	string filepath("./resources/dictionary.txt");
 	string starting_word;
 
-	loadFromDictionary(words, filepath);
-	//game_menu();
+	//loadFromDictionary(words, filepath);
+	mainMenu();
 	
 
 	return 0;
