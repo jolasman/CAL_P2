@@ -90,6 +90,9 @@ ipch/
 *.psess
 *.vsp
 *.vspx
+*.suo
+*vcxproj*
+*debug
 
 # Guidance Automation Toolkit
 *.gpState
@@ -213,6 +216,10 @@ pip-log.txt
 
 #Mr Developer
 .mr.developer.cfg
+
+#paths
+Debug/*
+*CAL_P2
 
 completa palavra.sln
 completa palavra.vcxproj.filters
