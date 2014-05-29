@@ -307,13 +307,18 @@ int main()
 {
 	vector<string> words;
 	//TODO user input starting_word and dictionary
-	string starting_word("ab");
+	string starting_word;
 	string filepath("./resources/dictionary.txt");
 
 	bool replay = true;
-
+	string input;
 	while (replay) {
-		gameEngine(filepath, starting_word);
+		do {
+			starting_word.clear();
+			cout << "Input starting word: ";
+			getline(cin, starting_word);
+		} while (starting_word.length() >= 5);
+		replay = gameEngine(filepath, starting_word);
 	}
 	
 
