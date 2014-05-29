@@ -318,10 +318,10 @@ int main()
 		string filepath("./resources/dictionary.txt");
 		cin.clear();
 		do {
-			cout << "Input starting word: ";
+			cout << "Input starting word(word size must be greater than 2): ";
 			cin.ignore();
 			getline(cin, starting_word);
-		} while (starting_word.size() <= 0 && starting_word.size() >= 5);
+		} while (starting_word.size() <= 0 || starting_word.size() >= 5 || starting_word.size() < 2);
 		replay = gameEngine(filepath, starting_word);
 	}
 	//game_menu();
