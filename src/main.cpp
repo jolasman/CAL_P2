@@ -8,112 +8,186 @@
 #include <fstream>
 #include <sstream>
 #include <conio.h>
+#include <time.h>
 using namespace std;
 
-#define DEBUG 1
+#define DEBUG 0
 
 
-/*
-memory test
-*/
-void loadFromDictionary(vector<string> &dictionary, string filepath){
+
+int selectOption(int &option, int nr_options, string msg){
+	//last option always is to quit
+	bool error = false;
+	do{
+		cin.clear();
+		
+		if(error){
+			cout<<"invalid input"<<endl;
+			cin.ignore(1000, '\n');
+		}
+		cout<<msg<<endl;
+		cin>>option;
+		error= true;
+	}
+	while(cin.fail() || option > nr_options || option < 1);
+
+	return 0;
+}
+
+
+int loadFromDictionary(vector<string> &dictionary, string filepath, string word){
 
 	ifstream file(filepath.c_str());
 	if (!file)
 	{ 
 		system("pwd\n");
-		cout << "Erro a abrir ficheiro de leitura\n";
+		cout << "Error opening dictionary\n";
 		_getch();
-		exit(1); }
+		exit(1); 
+	}
 
 	string tmp;
 
+	cout<<"Preparing the game..."<<endl;
+	system("CLS");
+
 	while (!file.eof()) {
-		getline(file, tmp);
-		dictionary.push_back(tmp);
+		getline(file, tmp);	
+		int q;
+		if(kmp(tmp, word, q) > 0){
+			dictionary.push_back(tmp);
+		}
 		tmp.clear();
 	}
 	file.close();
 
-	if(DEBUG){
-		cout <<dictionary.size()<< " nr of words"<<endl;
-		_getch();
-	}
+	return dictionary.size();
 }
 
 
-int filter(vector<string> &dictionary, string const &pattern){
+bool filter(vector<string> &dictionary, string const &pattern){
 
 	int q;
+	bool valid = false;
 
 	vector<int> filter_index;
-	for(unsigned int i = 0; i < dictionary.size(); i++){
+
+	if(DEBUG)
+		cout<<"At filter(). Dictionary size= "<<dictionary.size()<<endl;
+
+	for(unsigned int i = 0; i < dictionary.size(); i++)
+	{
 		if(kmp(dictionary[i], pattern, q) < 1)
 			filter_index.push_back(i);
 		else
 			if(q == 0 && dictionary[i].size() == pattern.size())
+			{
 				filter_index.push_back(i);
+				valid = true;
+			}
 
-		cout<<dictionary[i]<< "  q="<<q<<endl;
+			if(DEBUG){
+				cout<<"dictionary["<<i<<"]= "<<dictionary[i]<<"   q="<<q<<endl;
+			}
 	}
 
 
-	if(filter_index.size() > 0)
-
+	if((dictionary.size() - filter_index.size()) > 0 || valid) //the word exists
+	{
 		if(DEBUG)
-		for(int j = 0; j< filter_index.size(); j++)
-		{
-			cout<<"index to remove: "<< filter_index[j]<<endl;
-			cout<<"index to remove after previous remotions: "<< filter_index[j] - j<<endl<<endl;
-		}
+			for(int j = 0; j < filter_index.size(); j++)
+			{
+				cout<<"index to remove: "<< filter_index[j]<<endl;
+				cout<<"index to remove after previous remotions: "<< filter_index[j] - j<<endl<<endl;
+			}
 
-		for(int i = 0; i<filter_index.size(); i++)
-			dictionary.erase(dictionary.begin() + (filter_index[i]-i)); //the word index to remove varies with the number of previous remotions
+			for(int i = 0; i<filter_index.size(); i++)
+				dictionary.erase(dictionary.begin() + (filter_index[i]-i)); //the word index to remove varies with the number of previous remotions
 
-		if(DEBUG){
-			cout<<endl<<"remaining words"<<endl;
-			for(int i = 0; i< dictionary.size(); i++)
-				cout<<"#"<<i<<" : "<<dictionary[i]<<endl;
-		}
-	return filter_index.size();
+			if(DEBUG){
+				cout<<endl<<"remaining words"<<endl;
+				for(int i = 0; i< dictionary.size(); i++)
+					cout<<"#"<<i<<" : "<<dictionary[i]<<endl;
+			}
+
+			return true;
+	}
+
+	return false;
 }
 
 
 
 bool automatedMove(vector<string> &dictionary, string &pattern){
+	int q;
+
+	if(dictionary.size() > 0)
+	{
+		srand (time(NULL));
+		int random_nr = rand() % dictionary.size();
+
+		string chosen = dictionary[random_nr];
+		kmp(chosen, pattern, q);
+
+		if(q == 0)
+		{ //pattern is a prefix of the chosen word
+			pattern += chosen[pattern.size()];
+
+			if(DEBUG)
+				cout<<"prefix: New automated pattern :"<< pattern <<endl;
+
+			filter(dictionary, pattern);
+			return true;
+		}
+
+
+		if((q + pattern.size())>= chosen.size())
+		{ //the pattern is a suffix of the chosen word
+			pattern += chosen[q-1];
+
+			if(DEBUG)
+				cout<<"suffix: New automated pattern :"<< pattern <<endl;
+
+			return true;
+		}
+
+
+		random_nr = rand() % 2;
+
+		if((random_nr/2)==0)
+		{
+			pattern+= chosen[(q+pattern.size())];
+			cout<<"adding last: New automated pattern :"<< pattern <<endl;
+			return true;
+		}
+
+		pattern+= chosen[(q-1)];
+		cout<<"adding first: New automated pattern :"<< pattern <<endl;
+
+		filter(dictionary, pattern);
+
+		return true;
+
+	}
+
 
 	return false;
 }
 
+
 bool userMove(vector<string> &dictionary, string &pattern){
 	int option;
+	string msg("\n\nChoose an option:\n1-Insert at the beggining\n2-Insert at the end");
+	 msg= "Current Word: " + pattern + msg;
 
-	do{
-		cin.clear();
-		cin.ignore(1000, '\n');
-		system("CLS");
-		if(cin.fail()){
-			cin.clear();
-			cout<<"Invalid option"<<endl;
-		}
-		cout<<"Choose an option:\n1-Insert at the beggining\n2-Insert at the end\n";
-		cin>>option;	
-	}
-	while(cin.fail());
-
-
+	 selectOption(option, 2, msg);
 
 	char attach;
 	do{
 
 		cin.clear();
 		cin.ignore(1000, '\n');
-		system("CLS");
-		if(cin.fail()){
-			cout<<"Invalid option"<<endl;
-			cin.clear();
-		}
-		cout<<"Current word: "<<pattern<<endl<<"Insert char\n";
+		cout<<"\nCurrent word: "<<pattern<<endl<<"Insert char\n";
 		cin>>attach;
 	}
 	while(cin.fail());
@@ -131,21 +205,30 @@ bool userMove(vector<string> &dictionary, string &pattern){
 		return false;
 	}
 
-	int words_removed;
-	if((words_removed=filter(dictionary, tmp_pattern)) < 1)
+
+
+	if(!filter(dictionary, tmp_pattern))
+	{
+		if(DEBUG)
+			cout<<"userMove(): filter() return was false"<<endl;
 		return false;
-
-	else{
-
+	}
+	else
+	{
 
 		if(DEBUG)
 		{
 			cout<<"old pattern: "<<pattern<<endl;
 		}
+
 		pattern = tmp_pattern;
+
 		if(DEBUG)
 		{
-			cout<<"new pattern: "<<pattern<<endl<<"Words removed: "<<words_removed<<endl;
+			cout<<"new pattern: "<<pattern<<endl;
+			cout<<"dictionary size: "<<dictionary.size()<<endl;
+			for(int i =0; i < dictionary.size(); i++)
+				cout<<"#"<<i<<" "<< dictionary[i]<<endl;
 		}
 
 	}
@@ -153,20 +236,84 @@ bool userMove(vector<string> &dictionary, string &pattern){
 
 }
 
-bool gameEnd(vector<string> &dictionary, string &pattern){
+
+bool gameEnd(vector<string> const &dictionary){
+	if(dictionary.size() == 0)
+		return true;
+	return false;
+}
+
+
+bool gameEngine(string const &dictionary_path, string &word){
+	vector<string> dictionary;
+	loadFromDictionary(dictionary, dictionary_path, word);
+
+	if(dictionary.size() < 2)
+	{
+		cout<<"Either the dictionary doesn't know the word given, or there aren't enough words cointaining that to play."<<endl;
+		return false;
+	}
+
+
+	bool user_turn = false, quit = false;
+	int option;
+	string user_move_msg("1-try again\n2-quit");
+
+
+	while(!gameEnd(dictionary) && !quit){
+		switch(user_turn)
+		{
+		case true:
+			cout<<"Computer wrote: "<<word<<endl;
+			while(!userMove(dictionary, word))
+			{
+				selectOption(option, 2, user_move_msg);
+				if(option == 2)
+				{
+					quit = true;
+					break;
+				}
+			}
+			user_turn= false;
+			break;
+
+		default:
+			automatedMove(dictionary, word);
+			user_turn = true;
+			break;
+		}
+	}
+
+	if(!quit){
+		if(!user_turn)
+			cout<<"Congratulations! You won!!!\nPress any key."<<endl;
+		else
+		cout<<"Computer wins with: "<< word<<"! Try again.\nPress any key."<<endl;
+
+		_getch();
+	}
+
+
+	string play_again("Play another game?\n1-Yes\n2-No\n");
+	selectOption(option, 2, play_again);
+
+	if(option==1)
+		return true;
+
 	return false;
 }
 
 int main()
 {
 	vector<string> words;
-	string filepath("./resources/tester.txt");
-	loadFromDictionary(words, filepath);
+	//TODO user input starting_word and dictionary
+	string starting_word("ab");
+	string filepath("./resources/dictionary.txt");
 
-	//TODO user input starting_word
-	string starting_word("ana");
-	userMove(words, starting_word);
-	_getch();
+
+	gameEngine(filepath, starting_word);
+	
+
 
 	//game_menu();
 

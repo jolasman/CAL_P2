@@ -23,6 +23,7 @@ int kmp(string const &text, string const &pattern, int &shift)
 
 	if(text.size() < pattern.size())
 		return -1;
+
 	int q;
 	int num=0;
 	int m=pattern.length();
