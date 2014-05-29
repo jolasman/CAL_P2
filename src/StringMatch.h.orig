@@ -1,8 +1,12 @@
 #include <string>
 #include <vector>
 #include <iostream>
+<<<<<<< HEAD
+using namespace std;
+=======
 using namespace std;
 
 
 void pre_kmp(string const &pattern, vector<int> &prefix);
 int kmp(string const &text, string const &pattern, int &q);
+>>>>>>> origin/daniel_localdev
