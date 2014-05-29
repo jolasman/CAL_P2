@@ -143,7 +143,7 @@ bool automatedMove(vector<string> &dictionary, string &pattern){
 
 		if((q + pattern.size())>= chosen.size())
 		{ //the pattern is a suffix of the chosen word
-			pattern += chosen[q-1];
+			pattern = chosen[q-1]+pattern;
 
 			if(DEBUG)
 				cout<<"suffix: New automated pattern :"<< pattern <<endl;
@@ -156,12 +156,12 @@ bool automatedMove(vector<string> &dictionary, string &pattern){
 
 		if((random_nr/2)==0)
 		{
-			pattern+= chosen[(q+pattern.size())];
+			pattern += chosen[(q+pattern.size())];
 			cout<<"adding last: New automated pattern :"<< pattern <<endl;
 			return true;
 		}
 
-		pattern+= chosen[(q-1)];
+		pattern = chosen[(q-1)]+pattern;
 		cout<<"adding first: New automated pattern :"<< pattern <<endl;
 
 		filter(dictionary, pattern);
@@ -310,8 +310,11 @@ int main()
 	string starting_word("ab");
 	string filepath("./resources/dictionary.txt");
 
+	bool replay = true;
 
-	gameEngine(filepath, starting_word);
+	while (replay) {
+		gameEngine(filepath, starting_word);
+	}
 	
 
 
