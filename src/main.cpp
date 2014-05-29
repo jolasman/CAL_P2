@@ -11,7 +11,7 @@
 #include <time.h>
 using namespace std;
 
-#define DEBUG 1
+#define DEBUG 0
 
 
 
@@ -313,15 +313,15 @@ int main()
 	bool replay = true;
 	while (replay) {
 		vector<string> words;
-		string starting_word = "";
+		string starting_word;
 		cout << starting_word << endl;
 		string filepath("./resources/dictionary.txt");
 		cin.clear();
 		do {
 			cout << "Input starting word: ";
+			cin.ignore();
 			getline(cin, starting_word);
-		} while (starting_word.size() >= 5);
-		starting_word = "abeto";
+		} while (starting_word.size() <= 0 && starting_word.size() >= 5);
 		replay = gameEngine(filepath, starting_word);
 	}
 	//game_menu();
