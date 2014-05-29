@@ -11,7 +11,7 @@
 #include <time.h>
 using namespace std;
 
-#define DEBUG 0
+#define DEBUG 1
 
 
 
@@ -47,14 +47,14 @@ int loadFromDictionary(vector<string> &dictionary, string filepath, string word)
 	}
 
 	string tmp;
-
-	cout<<"Preparing the game..."<<endl;
 	system("CLS");
+	cout<<"Preparing the game..."<<endl;
+	
 
 	while (!file.eof()) {
 		getline(file, tmp);	
 		int q;
-		if(kmp(tmp, word, q) > 0){
+		if(kmp(tmp, word, q) > 0 && word.size() < tmp.size()){
 			dictionary.push_back(tmp);
 		}
 		tmp.clear();
@@ -77,6 +77,8 @@ bool filter(vector<string> &dictionary, string const &pattern){
 
 	for(unsigned int i = 0; i < dictionary.size(); i++)
 	{
+		int found;
+
 		if(kmp(dictionary[i], pattern, q) < 1)
 			filter_index.push_back(i);
 		else
@@ -148,6 +150,7 @@ bool automatedMove(vector<string> &dictionary, string &pattern){
 			if(DEBUG)
 				cout<<"suffix: New automated pattern :"<< pattern <<endl;
 
+			filter(dictionary, pattern);
 			return true;
 		}
 
@@ -158,6 +161,7 @@ bool automatedMove(vector<string> &dictionary, string &pattern){
 		{
 			pattern += chosen[(q+pattern.size())];
 			cout<<"adding last: New automated pattern :"<< pattern <<endl;
+
 			return true;
 		}
 
@@ -305,27 +309,22 @@ bool gameEngine(string const &dictionary_path, string &word){
 
 int main()
 {
-	vector<string> words;
 	//TODO user input starting_word and dictionary
-	string starting_word;
-	string filepath("./resources/dictionary.txt");
-
 	bool replay = true;
-	string input;
 	while (replay) {
+		vector<string> words;
+		string starting_word = "";
+		cout << starting_word << endl;
+		string filepath("./resources/dictionary.txt");
+		cin.clear();
 		do {
-			starting_word.clear();
 			cout << "Input starting word: ";
 			getline(cin, starting_word);
-		} while (starting_word.length() >= 5);
+		} while (starting_word.size() >= 5);
+		starting_word = "abeto";
 		replay = gameEngine(filepath, starting_word);
 	}
-	
-
-
 	//game_menu();
-
-
 	return 0;
 
 }
