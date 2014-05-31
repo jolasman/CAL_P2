@@ -1,13 +1,14 @@
 #include "Interface.h"
 
-/*apresenta no ecra o menu de opções entre os outros submenus para a possivel navegacao do utilizador*/
-void mainMenu() {
+/*apresenta no ecra o menu de opcoes entre os outros submenus para a possivel navegacao do utilizador*/
+int mainMenu() {
 	int result = -1;
 	while (result == -1) {
 		system("CLS");
 		cout << "--------------------------------Find the word---------------------------------\n\n";
 		cout << "1. Play" << endl;
 		cout << "2. Instructions" << endl;
+		cout << "3. Change dictionary" << endl;
 		cout << "0. Exit\n\n";
 		cout << "Choose a number: ";
 		string input;
@@ -20,15 +21,16 @@ void mainMenu() {
 		} else result = parseInput(input);
 		switch (result) {
 		case 0:
-			exitScreen();
+			return 0;
 			break;
 		case 1:
-			cout << "GAME PLACEHOLDER" << endl;
-			Sleep(200);
-			result = -1;
+			return 1;
 			break;
 		case 2:
-			instructionScreen();
+			return 2;
+			break;
+		case 3:
+			return 3;
 			break;
 		default:
 			result = -1;
@@ -46,6 +48,7 @@ void exitScreen() {
 	cout << "\n                                                               Daniel Mendonca";
 	cout << "\n                                                               Francisco Lopes\n\n";
 }
+
 /*apresenta no ecra o menu de instrucoes*/
 void instructionScreen() {
 	system("CLS");
@@ -58,10 +61,9 @@ void instructionScreen() {
 	cout << "The winner should show what word he was thinking of.\n\n\n";
 	cout << "                        (press any key to continue)";
 	_getch();
-	mainMenu();
 }
 
-int parseInput(string &input) {
+int parseInput(string input) {
 	stringstream convert(input);
 	int result;
 	if (!(convert >> result)) {

@@ -11,8 +11,8 @@
 
 using namespace std;
 
-void mainMenu();
+int mainMenu();
 void exitScreen();
 void instructionScreen();
-int parseInput(string &input);
+int parseInput(string input);
 #endif

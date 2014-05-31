@@ -18,15 +18,16 @@ using namespace std;
 int selectOption(int &option, int nr_options, string msg){
 	//last option always is to quit
 	bool error = false;
+	string input;
 	do{
 		cin.clear();
-		
 		if(error){
 			cout<<"invalid input"<<endl;
-			cin.ignore(1000, '\n');
 		}
 		cout<<msg<<endl;
-		cin>>option;
+		getline(cin, input);
+		stringstream convert(input);
+		convert >> option;
 		error= true;
 	}
 	while(cin.fail() || option > nr_options || option < 1);
@@ -40,16 +41,19 @@ int loadFromDictionary(vector<string> &dictionary, string filepath, string word)
 	ifstream file(filepath.c_str());
 	if (!file)
 	{ 
-		system("pwd\n");
-		cout << "Error opening dictionary\n";
+		system("cls");
+		cout << "Error opening dictionary!" << endl;
+		system("cd");
+		cout << filepath << endl << endl;
+		cout << "Check if file is placed in the correct folder specified above." << endl;
+		cout << "(press any key to continue)";
 		_getch();
-		exit(1); 
+		return -1;
 	}
 
 	string tmp;
 	system("CLS");
 	cout<<"Preparing the game..."<<endl;
-	
 
 	while (!file.eof()) {
 		getline(file, tmp);	
@@ -186,13 +190,10 @@ bool userMove(vector<string> &dictionary, string &pattern){
 
 	 selectOption(option, 2, msg);
 
-	char attach;
+	 string attach;
 	do{
-
-		cin.clear();
-		cin.ignore(1000, '\n');
 		cout<<"\nCurrent word: "<<pattern<<endl<<"Insert char\n";
-		cin>>attach;
+		getline(cin, attach);
 	}
 	while(cin.fail());
 
@@ -200,10 +201,10 @@ bool userMove(vector<string> &dictionary, string &pattern){
 
 	switch(option){
 	case 1:
-		tmp_pattern = attach + pattern;
+		tmp_pattern = attach[0] + pattern;
 		break;
 	case 2:
-		tmp_pattern = pattern + attach;
+		tmp_pattern = pattern + attach[0];
 		break;
 	default:
 		return false;
@@ -250,11 +251,17 @@ bool gameEnd(vector<string> const &dictionary){
 
 bool gameEngine(string const &dictionary_path, string &word){
 	vector<string> dictionary;
-	loadFromDictionary(dictionary, dictionary_path, word);
+	int status;
+	status = loadFromDictionary(dictionary, dictionary_path, word);
 
 	if(dictionary.size() < 2)
 	{
-		cout<<"Either the dictionary doesn't know the word given, or there aren't enough words cointaining that to play."<<endl;
+		if (status == -1) {
+			return false;
+		}
+		cout << "Either the dictionary doesn't know the word given, or there aren't enough words cointaining that to play." << endl;
+		cout << "(press any key to continue)";
+		_getch();
 		return false;
 	}
 
@@ -309,22 +316,49 @@ bool gameEngine(string const &dictionary_path, string &word){
 
 int main()
 {
-	//TODO user input starting_word and dictionary
-	bool replay = true;
-	while (replay) {
-		vector<string> words;
-		string starting_word;
-		cout << starting_word << endl;
-		string filepath("./resources/dictionary.txt");
-		cin.clear();
-		do {
-			cout << "Input starting word(word size must be greater than 2): ";
-			cin.ignore();
-			getline(cin, starting_word);
-		} while (starting_word.size() <= 0 || starting_word.size() >= 5 || starting_word.size() < 2);
-		replay = gameEngine(filepath, starting_word);
+	string dictionary("dictionary.txt");
+	string filepath = "./resources/" + dictionary;
+	while (true) {
+		bool replay = true;
+		int choice;
+		choice = mainMenu();
+		switch (choice) {
+		case 0:
+			exitScreen();
+			return 0;
+			break;
+		case 1:
+			while (replay) {
+				vector<string> words;
+				string starting_word;
+				do {
+					cout << "Input starting word(word size must be greater than 2): ";
+					getline(cin, starting_word);
+				} while (starting_word.size() >= 5 || starting_word.size() <= 2);
+				replay = gameEngine(filepath, starting_word);
+			}
+			break;
+		case 2:
+			instructionScreen();
+			break;
+		case 3:
+			system("cls");
+			cout << "Current dictionary: " << endl;
+			system("cd");
+			cout << "/resources/" << dictionary << endl << endl;
+			cout << "The new dictionary should be placed in the resources folder located on the path written above!" << endl;
+			cout << "Input name of new dictionary: (eg: novo.txt)" << endl;
+			getline(cin, dictionary);
+			if (cin.fail()) {
+				dictionary = "dictionary.txt";
+				cin.clear();
+				cout << "Invalid input!";
+				Sleep(300);
+			}
+			filepath = "./resources/" + dictionary;
+			break;
+		default:
+			break;
+		}
 	}
-	//game_menu();
-	return 0;
-
 }
